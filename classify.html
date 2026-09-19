@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Classify - Cyber Triage</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background:
+                radial-gradient(circle at 80% 0%, rgba(37, 99, 235, 0.10), transparent 30%),
+                #0b1020;
+            color: #e5e7eb;
+        }
+
+        /* ================= HEADER ================= */
+
+        header {
+            height: 70px;
+            background: rgba(21, 27, 46, 0.96);
+            border-bottom: 1px solid #252d45;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #1d4ed8;
+            border-radius: 10px;
+
+            font-size: 20px;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .logo-text {
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .officer {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .logout {
+            color: #60a5fa;
+            cursor: pointer;
+        }
+
+        .logout:hover {
+            color: #93c5fd;
+        }
+
+
+        /* ================= PAGE ================= */
+
+        main {
+            padding: 28px 32px;
+        }
+
+        .page-heading {
+            margin-bottom: 20px;
+        }
+
+        .page-heading h1 {
+            margin: 0 0 6px;
+            font-size: 27px;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: #8b95aa;
+            font-size: 14px;
+        }
+
+
+        /* ================= EXPLORER ================= */
+
+        .explorer {
+            display: grid;
+            grid-template-columns: 230px 1fr;
+
+            min-height: 650px;
+
+            background: rgba(21, 27, 46, 0.92);
+
+            border: 1px solid #29334d;
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            background: rgba(13, 19, 34, 0.85);
+            border-right: 1px solid #29334d;
+
+            padding: 18px 12px;
+        }
+
+        .sidebar-title {
+            padding: 8px 12px 12px;
+
+            color: #64748b;
+
+            font-size: 11px;
+            font-weight: bold;
+
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 11px 12px;
+
+            margin-bottom: 4px;
+
+            border-radius: 8px;
+
+            color: #b8c1d4;
+
+            font-size: 14px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #182238;
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: #172554;
+            color: #60a5fa;
+
+            border: 1px solid rgba(59, 130, 246, 0.18);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+
+        /* ================= EXPLORER MAIN ================= */
+
+        .explorer-main {
+            min-width: 0;
+        }
+
+
+        /* ================= TOOLBAR ================= */
+
+        .toolbar {
+            height: 62px;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 0 18px;
+
+            border-bottom: 1px solid #29334d;
+        }
+
+        .toolbar-button {
+            padding: 8px 11px;
+
+            background: transparent;
+            border: 1px solid transparent;
+
+            border-radius: 7px;
+
+            color: #9ca3af;
+
+            cursor: pointer;
+
+            font-size: 13px;
+        }
+
+        .toolbar-button:hover {
+            background: #1a243b;
+            border-color: #29334d;
+            color: #ffffff;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: #29334d;
+            margin: 0 5px;
+        }
+
+
+        /* ================= SEARCH ================= */
+
+        .search {
+            margin-left: auto;
+
+            width: 230px;
+
+            position: relative;
+        }
+
+        .search input {
+            width: 100%;
+
+            padding: 9px 12px 9px 35px;
+
+            background: #0f172a;
+
+            border: 1px solid #29334d;
+
+            border-radius: 8px;
+
+            outline: none;
+
+            color: #e5e7eb;
+
+            font-size: 12px;
+        }
+
+        .search input:focus {
+            border-color: #3b82f6;
+        }
+
+        .search-icon {
+            position: absolute;
+
+            left: 12px;
+            top: 8px;
+
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+
+        /* ================= BREADCRUMB ================= */
+
+        .breadcrumb {
+            height: 50px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 0 20px;
+
+            border-bottom: 1px solid #29334d;
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+        .breadcrumb .current {
+            color: #dbeafe;
+        }
+
+        .arrow {
+            color: #475569;
+        }
+
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            padding: 24px;
+        }
+
+        .location-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+        }
+
+        .location-heading h2 {
+            margin: 0;
+
+            font-size: 19px;
+        }
+
+        .location-heading span {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+
+        /* ================= FOLDERS ================= */
+
+        .folders {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fill, minmax(170px, 1fr));
+
+            gap: 12px;
+
+            margin-bottom: 28px;
+        }
+
+        .folder {
+            min-height: 115px;
+
+            padding: 17px;
+
+            background: #111a2d;
+
+            border: 1px solid #29334d;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            position: relative;
+        }
+
+        .folder:hover {
+            transform: translateY(-2px);
+
+            background: #162038;
+
+            border-color: #3b82f6;
+
+            box-shadow:
+                0 8px 25px rgba(37, 99, 235, 0.10);
+        }
+
+        .folder-icon {
+            font-size: 31px;
+
+            margin-bottom: 12px;
+        }
+
+        .folder-name {
+            font-size: 14px;
+            font-weight: bold;
+
+            color: #e5e7eb;
+        }
+
+        .folder-count {
+            margin-top: 5px;
+
+            color: #64748b;
+
+            font-size: 11px;
+        }
+
+
+        /* ================= FILE SECTION ================= */
+
+        .files-heading {
+            display: flex;
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 10px;
+        }
+
+        .files-heading h3 {
+            margin: 0;
+
+            font-size: 14px;
+        }
+
+        .files-heading span {
+            color: #64748b;
+            font-size: 11px;
+        }
+
+
+        .file-list {
+            border: 1px solid #29334d;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+
+            background: #0f172a;
+        }
+
+        .file-header,
+        .file-row {
+            display: grid;
+
+            grid-template-columns:
+                1fr 130px 130px 120px;
+
+            align-items: center;
+        }
+
+        .file-header {
+            padding: 11px 15px;
+
+            background: #111827;
+
+            color: #64748b;
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+        }
+
+        .file-row {
+            padding: 14px 15px;
+
+            border-top: 1px solid #202a40;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .file-row:hover {
+            background: #172033;
+        }
+
+        .file-name {
+            display: flex;
+            align-items: center;
+
+            gap: 11px;
+
+            font-size: 13px;
+        }
+
+        .file-icon {
+            font-size: 20px;
+        }
+
+        .evidence-id {
+            color: #60a5fa;
+            font-size: 12px;
+        }
+
+        .file-type {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .status {
+            color: #4ade80;
+            font-size: 11px;
+        }
+
+
+        /* ================= PERSON RECORDS ================= */
+
+        .person-section {
+            margin-top: 20px;
+
+            padding: 18px;
+
+            border: 1px solid #29334d;
+
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(30, 41, 59, 0.65),
+                    rgba(15, 23, 42, 0.75)
+                );
+        }
+
+        .person-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .person-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .person-title-icon {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #172554;
+
+            font-size: 20px;
+        }
+
+        .person-title h3 {
+            margin: 0 0 4px;
+
+            font-size: 14px;
+        }
+
+        .person-title p {
+            margin: 0;
+
+            color: #64748b;
+
+            font-size: 11px;
+        }
+
+        .person-button {
+            padding: 9px 14px;
+
+            border: 1px solid #315aa8;
+
+            background: #172554;
+
+            color: #60a5fa;
+
+            border-radius: 7px;
+
+            font-size: 12px;
+
+            cursor: pointer;
+        }
+
+        .person-button:hover {
+            background: #1e3a8a;
+            color: #bfdbfe;
+        }
+
+
+        /* ================= BOTTOM ================= */
+
+        .bottom {
+            display: flex;
+
+            justify-content: flex-end;
+
+            margin-top: 18px;
+        }
+
+        .continue {
+            padding: 11px 18px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 13px;
+
+            cursor: pointer;
+        }
+
+        .continue:hover {
+            background: #3b82f6;
+        }
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 850px) {
+
+            .explorer {
+                grid-template-columns: 190px 1fr;
+            }
+
+            .file-header,
+            .file-row {
+                grid-template-columns:
+                    1fr 100px 100px;
+            }
+
+            .file-header div:last-child,
+            .file-row .status {
+                display: none;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            header {
+                padding: 0 18px;
+            }
+
+            .officer span:first-child {
+                display: none;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            .explorer {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: flex;
+
+                overflow-x: auto;
+
+                border-right: none;
+                border-bottom: 1px solid #29334d;
+
+                padding: 10px;
+            }
+
+            .sidebar-title {
+                display: none;
+            }
+
+            .nav-item {
+                white-space: nowrap;
+            }
+
+            .search {
+                width: 160px;
+            }
+
+            .toolbar-button {
+                display: none;
+            }
+
+            .folders {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .file-header {
+                display: none;
+            }
+
+            .file-row {
+                grid-template-columns: 1fr;
+                gap: 7px;
+            }
+
+            .file-type,
+            .evidence-id,
+            .status {
+                margin-left: 31px;
+            }
+
+            .person-top {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- ================= HEADER ================= -->
+
+<header>
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            🛡️
+        </div>
+
+        <div class="logo-text">
+            Cyber Triage
+        </div>
+
+    </div>
+
+
+    <div class="officer">
+
+        <span>👮 officer01</span>
+
+        <span
+            class="logout"
+            onclick="logout()">
+
+            Logout
+
+        </span>
+
+    </div>
+
+</header>
+
+
+
+<main>
+
+
+    <!-- ================= TITLE ================= -->
+
+    <div class="page-heading">
+
+        <h1>📂 Classify Evidence</h1>
+
+        <p>
+            Organize and classify digital evidence for the investigation.
+        </p>
+
+    </div>
+
+
+
+    <!-- ================= EXPLORER ================= -->
+
+    <div class="explorer">
+
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-title">
+                Navigation
+            </div>
+
+
+            <div
+                class="nav-item active"
+                onclick="showCase()">
+
+                <span class="nav-icon">📁</span>
+
+                <span>Case Evidence</span>
+
+            </div>
+
+
+            <div
+                class="nav-item"
+                onclick="openPersonRecords()">
+
+                <span class="nav-icon">🗃️</span>
+
+                <span>Person Records</span>
+
+            </div>
+
+
+            <div class="sidebar-title">
+                Current Case
+            </div>
+
+
+            <div class="nav-item">
+
+                <span class="nav-icon">📁</span>
+
+                <span>CASE-1042</span>
+
+            </div>
+
+
+        </aside>
+
+
+
+        <!-- ================= EXPLORER MAIN ================= -->
+
+        <section class="explorer-main">
+
+
+            <!-- TOOLBAR -->
+
+            <div class="toolbar">
+
+                <button
+                    class="toolbar-button"
+                    onclick="goBack()">
+
+                    ← Back
+
+                </button>
+
+                <button
+                    class="toolbar-button">
+
+                    → Forward
+
+                </button>
+
+                <button
+                    class="toolbar-button"
+                    onclick="refreshPage()">
+
+                    ↻ Refresh
+
+                </button>
+
+
+                <div class="toolbar-divider"></div>
+
+
+                <button
+                    class="toolbar-button">
+
+                    + New Folder
+
+                </button>
+
+
+                <div class="search">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search this case..."
+                        onkeyup="searchFiles()">
+
+                </div>
+
+            </div>
+
+
+
+            <!-- BREADCRUMB -->
+
+            <div class="breadcrumb">
+
+                <span>Cases</span>
+
+                <span class="arrow">›</span>
+
+                <span>CASE-1042</span>
+
+                <span class="arrow">›</span>
+
+                <span class="current">
+                    Classify
+                </span>
+
+            </div>
+
+
+
+            <!-- CONTENT -->
+
+            <div class="content">
+
+
+                <div class="location-heading">
+
+                    <h2>
+                        👤 Victim - John Doe
+                    </h2>
+
+                    <span>
+                        5 folders
+                    </span>
+
+                </div>
+
+
+
+                <!-- ================= FOLDERS ================= -->
+
+                <div class="folders">
+
+
+                    <div
+                        class="folder"
+                        onclick="openFolder('Emails')">
+
+                        <div class="folder-icon">
+                            📁
+                        </div>
+
+                        <div class="folder-name">
+                            Emails
+                        </div>
+
+                        <div class="folder-count">
+                            3 items
+                        </div>
+
+                    </div>
+
+
+
+                    <div
+                        class="folder"
+                        onclick="openFolder('Network')">
+
+                        <div class="folder-icon">
+                            📁
+                        </div>
+
+                        <div class="folder-name">
+                            Network
+                        </div>
+
+                        <div class="folder-count">
+                            4 items
+                        </div>
+
+                    </div>
+
+
+
+                    <div
+                        class="folder"
+                        onclick="openFolder('Files')">
+
+                        <div class="folder-icon">
+                            📁
+                        </div>
+
+                        <div class="folder-name">
+                            Files
+                        </div>
+
+                        <div class="folder-count">
+                            6 items
+                        </div>
+
+                    </div>
+
+
+
+                    <div
+                        class="folder"
+                        onclick="openFolder('Devices')">
+
+                        <div class="folder-icon">
+                            📁
+                        </div>
+
+                        <div class="folder-name">
+                            Devices
+                        </div>
+
+                        <div class="folder-count">
+                            2 items
+                        </div>
+
+                    </div>
+
+
+
+                    <div
+                        class="folder"
+                        onclick="openFolder('Accounts')">
+
+                        <div class="folder-icon">
+                            📁
+                        </div>
+
+                        <div class="folder-name">
+                            Accounts
+                        </div>
+
+                        <div class="folder-count">
+                            3 items
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================= FILES ================= -->
+
+                <div class="files-heading">
+
+                    <h3>
+                        📄 Recent Evidence
+                    </h3>
+
+                    <span>
+                        3 items
+                    </span>
+
+                </div>
+
+
+
+                <div class="file-list">
+
+
+                    <div class="file-header">
+
+                        <div>Name</div>
+
+                        <div>Evidence ID</div>
+
+                        <div>Type</div>
+
+                        <div>Status</div>
+
+                    </div>
+
+
+
+                    <div
+                        class="file-row"
+                        onclick="selectFile('Phishing_Email_01.eml', 'EV-1042-001')">
+
+                        <div class="file-name">
+
+                            <span class="file-icon">
+                                📧
+                            </span>
+
+                            <span>
+                                Phishing_Email_01.eml
+                            </span>
+
+                        </div>
+
+                        <div class="evidence-id">
+                            EV-1042-001
+                        </div>
+
+                        <div class="file-type">
+                            Email
+                        </div>
+
+                        <div class="status">
+                            ✓ Verified
+                        </div>
+
+                    </div>
+
+
+
+                    <div
+                        class="file-row"
+                        onclick="selectFile('Malicious_Email.eml', 'EV-1042-002')">
+
+                        <div class="file-name">
+
+                            <span class="file-icon">
+                                📧
+                            </span>
+
+                            <span>
+                                Malicious_Email.eml
+                            </span>
+
+                        </div>
+
+                        <div class="evidence-id">
+                            EV-1042-002
+                        </div>
+
+                        <div class="file-type">
+                            Email
+                        </div>
+
+                        <div class="status">
+                            ✓ Verified
+                        </div>
+
+                    </div>
+
+
+
+                    <div
+                        class="file-row"
+                        onclick="selectFile('Suspicious_Link.txt', 'EV-1042-003')">
+
+                        <div class="file-name">
+
+                            <span class="file-icon">
+                                🔗
+                            </span>
+
+                            <span>
+                                Suspicious_Link.txt
+                            </span>
+
+                        </div>
+
+                        <div class="evidence-id">
+                            EV-1042-003
+                        </div>
+
+                        <div class="file-type">
+                            URL
+                        </div>
+
+                        <div class="status">
+                            ✓ Verified
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ================= PERSON RECORDS ================= -->
+
+                <div class="person-section">
+
+                    <div class="person-top">
+
+
+                        <div class="person-title">
+
+                            <div class="person-title-icon">
+                                🗃️
+                            </div>
+
+
+                            <div>
+
+                                <h3>
+                                    Person Records
+                                </h3>
+
+                                <p>
+                                    Separate officer-maintained records
+                                    for identified or apprehended persons.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="person-button"
+                            onclick="openPersonRecords()">
+
+                            Open Person Records →
+
+                        </button>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================= CONTINUE ================= -->
+
+                <div class="bottom">
+
+                    <button
+                        class="continue"
+                        onclick="continueToExtract()">
+
+                        Continue to Extract →
+
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+
+<script>
+
+    function openFolder(folderName) {
+
+        alert(
+            "Opening folder: " +
+            folderName
+        );
+
+    }
+
+
+    function selectFile(fileName, evidenceId) {
+
+        alert(
+            "Evidence selected:\n\n" +
+            fileName +
+            "\n" +
+            evidenceId
+        );
+
+    }
+
+
+    function searchFiles() {
+
+        const search =
+            document
+                .getElementById("searchInput")
+                .value
+                .toLowerCase();
+
+        const rows =
+            document.querySelectorAll(".file-row");
+
+        rows.forEach(function(row) {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            if (text.includes(search)) {
+
+                row.style.display = "grid";
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+    }
+
+
+    function openPersonRecords() {
+
+        alert(
+            "Person Records\n\n" +
+            "This section contains officer-maintained " +
+            "records for identified or apprehended persons."
+        );
+
+    }
+
+
+    function continueToExtract() {
+
+        window.location.href =
+            "extract.html";
+
+    }
+
+
+    function goBack() {
+
+        window.history.back();
+
+    }
+
+
+    function refreshPage() {
+
+        window.location.reload();
+
+    }
+
+
+    function showCase() {
+
+        window.location.reload();
+
+    }
+
+
+    function logout() {
+
+        window.location.href =
+            "index.html";
+
+    }
+
+</script>
+
+
+</body>
+</html>

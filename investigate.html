@@ -1,0 +1,2545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Triage — Investigate</title>
+
+<style>
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #020b18;
+    --bg2: #061426;
+    --panel: #071a30;
+    --panel2: #09213b;
+    --border: #123b62;
+
+    --blue: #168cff;
+    --cyan: #19e4e1;
+    --purple: #7657ff;
+    --green: #00dfbb;
+    --red: #ff4f68;
+    --yellow: #f7b733;
+
+    --text: #f1f6ff;
+    --muted: #7e9ab9;
+    --muted2: #a7bdd5;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    color: var(--text);
+    background:
+        radial-gradient(circle at 70% 0%, rgba(25, 85, 150, .12), transparent 35%),
+        radial-gradient(circle at 15% 100%, rgba(34, 66, 130, .1), transparent 30%),
+        var(--bg);
+
+    overflow-x: hidden;
+}
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 224px minmax(0, 1fr);
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 224px;
+
+    background:
+        linear-gradient(180deg, #031121 0%, #031426 65%, #061a2e 100%);
+
+    border-right: 1px solid #12304c;
+    z-index: 50;
+    overflow: hidden;
+}
+
+.logo {
+    height: 82px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 22px;
+    border-bottom: 1px solid #112e48;
+}
+
+.logo-shield {
+    width: 40px;
+    height: 46px;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #32a8ff;
+    font-size: 23px;
+
+    background:
+        linear-gradient(145deg, rgba(22, 140, 255, .22), rgba(88, 62, 255, .08));
+
+    clip-path: polygon(50% 0%, 92% 14%, 87% 62%, 50% 100%, 13% 62%, 8% 14%);
+    border: 2px solid #2b9cff;
+}
+
+.logo-text strong {
+    display: block;
+    font-size: 16px;
+    letter-spacing: -.3px;
+}
+
+.logo-text span {
+    display: block;
+    margin-top: 3px;
+    color: #6f94b7;
+    font-size: 9px;
+}
+
+.nav {
+    padding: 21px 10px;
+}
+
+.nav-item {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 0 15px;
+    margin-bottom: 3px;
+
+    color: #9ab2cc;
+    border-radius: 9px;
+
+    font-size: 14px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.nav-item:hover {
+    color: white;
+    background: rgba(23, 87, 145, .2);
+}
+
+.nav-item.active {
+    color: white;
+    background:
+        linear-gradient(90deg, rgba(56, 78, 190, .58), rgba(32, 69, 145, .55));
+    box-shadow:
+        inset 3px 0 0 #835cff,
+        0 0 20px rgba(56, 76, 200, .12);
+}
+
+.nav-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 19px;
+}
+
+.check {
+    margin-left: auto;
+
+    width: 19px;
+    height: 19px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #00cdb7;
+    color: #001b25;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.quote {
+    position: absolute;
+    bottom: 36px;
+    left: 31px;
+    right: 25px;
+
+    color: #a8c4e1;
+    font-size: 13px;
+    line-height: 1.45;
+    font-style: italic;
+}
+
+.quote small {
+    display: block;
+    margin-top: 8px;
+    font-style: normal;
+    color: #7592ae;
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main {
+    grid-column: 2;
+    min-width: 0;
+}
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.topbar {
+    height: 82px;
+
+    display: grid;
+    grid-template-columns: 1fr minmax(400px, 600px) 1fr;
+    align-items: center;
+
+    border-bottom: 1px solid #12304b;
+    background: rgba(3, 16, 31, .9);
+}
+
+.progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+
+.step {
+    position: relative;
+    width: 125px;
+    text-align: center;
+    color: #7d98b5;
+    font-size: 13px;
+}
+
+.step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+
+    left: calc(50% + 12px);
+    top: 10px;
+
+    width: 101px;
+    height: 1px;
+
+    background: linear-gradient(90deg, #00d9bf, #24517b);
+}
+
+.step-dot {
+    position: relative;
+    z-index: 2;
+
+    width: 22px;
+    height: 22px;
+    margin: 0 auto 7px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #00d6bc;
+    color: #00211f;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.step.current {
+    color: white;
+    font-weight: 600;
+}
+
+.step.current .step-dot {
+    width: 36px;
+    height: 36px;
+    margin-top: -7px;
+    margin-bottom: 0;
+
+    background:
+        radial-gradient(circle, #7158ff 0 35%, #6651ef 40%, #33268b 100%);
+
+    box-shadow:
+        0 0 20px rgba(107, 83, 255, .65);
+    color: white;
+
+    font-size: 19px;
+}
+
+.top-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 18px;
+    padding-right: 20px;
+}
+
+.mode-icon {
+    color: #a5c0da;
+    font-size: 19px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding-left: 12px;
+    border-left: 1px solid #173651;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+    background: #1a365b;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+}
+
+.profile strong {
+    display: block;
+    font-size: 12px;
+}
+
+.profile span {
+    display: block;
+    margin-top: 4px;
+    color: #7193b4;
+    font-size: 10px;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.content {
+    padding: 22px 30px 26px;
+    max-width: 1700px;
+    margin: auto;
+}
+
+.page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.search-big {
+    width: 60px;
+    height: 60px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 28px;
+    color: white;
+
+    background:
+        radial-gradient(circle, #6752f5 0 30%, #34248f 100%);
+
+    border: 1px solid #755cff;
+    box-shadow: 0 0 25px rgba(102, 81, 255, .24);
+}
+
+.page-title h1 {
+    font-size: 25px;
+    letter-spacing: -.5px;
+}
+
+.page-title p {
+    margin-top: 4px;
+    color: #7595b4;
+    font-size: 12px;
+}
+
+.case {
+    padding: 11px 17px;
+    min-width: 210px;
+
+    border: 1px solid #15426a;
+    border-radius: 6px;
+    background: rgba(4, 22, 41, .6);
+
+    font-size: 11px;
+}
+
+.case-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.case-row:last-child {
+    margin-bottom: 0;
+}
+
+.case-label {
+    color: #7390ac;
+}
+
+.status {
+    color: #dfeaf5;
+}
+
+.status i {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 7px;
+
+    border-radius: 50%;
+    background: #00d9bb;
+}
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.tabs {
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+
+    margin-bottom: 15px;
+
+    border: 1px solid #15466d;
+    border-radius: 9px;
+
+    background: #061a30;
+    overflow: hidden;
+}
+
+.tab {
+    flex: 1;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #83a0be;
+    font-size: 12px;
+    border-right: 1px solid #11324f;
+
+    cursor: pointer;
+}
+
+.tab:last-child {
+    border-right: 0;
+}
+
+.tab.active {
+    color: white;
+    background: linear-gradient(180deg, #09284a, #071c35);
+    box-shadow: inset 0 -3px 0 #7b55ff;
+}
+
+/* =========================================================
+   LEAD CARDS
+========================================================= */
+
+.lead-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 17px;
+}
+
+.card {
+    border: 1px solid #15507a;
+    border-radius: 11px;
+
+    background:
+        linear-gradient(145deg, rgba(7, 31, 56, .98), rgba(3, 19, 36, .96));
+
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.015);
+}
+
+.lead-card {
+    min-height: 194px;
+    padding: 18px;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.lead-card.network {
+    border-color: #1579b5;
+}
+
+.lead-card.entity {
+    border-color: #009a9a;
+    background:
+        linear-gradient(145deg, rgba(4, 38, 48, .98), rgba(3, 25, 38, .96));
+}
+
+.lead-card.malware {
+    border-color: #6546b7;
+    background:
+        linear-gradient(145deg, rgba(25, 20, 59, .98), rgba(10, 15, 39, .96));
+}
+
+.lead-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    font-size: 22px;
+    margin-bottom: 9px;
+}
+
+.network .lead-icon {
+    background: rgba(22, 140, 255, .16);
+    color: #31adff;
+}
+
+.entity .lead-icon {
+    background: rgba(0, 214, 184, .15);
+    color: #19dec2;
+}
+
+.malware .lead-icon {
+    background: rgba(139, 88, 255, .17);
+    color: #bb91ff;
+}
+
+.badge {
+    position: absolute;
+    top: 14px;
+    right: 15px;
+
+    padding: 5px 11px;
+    border-radius: 20px;
+
+    font-size: 10px;
+}
+
+.network .badge {
+    color: #31a8ff;
+    border: 1px solid #087bc5;
+    background: rgba(10, 102, 170, .12);
+}
+
+.entity .badge {
+    color: #18dfca;
+    border: 1px solid #00a696;
+    background: rgba(0, 167, 151, .1);
+}
+
+.malware .badge {
+    color: #b582ff;
+    border: 1px solid #8044dc;
+    background: rgba(107, 64, 185, .12);
+}
+
+.lead-card h2 {
+    font-size: 15px;
+    line-height: 1.25;
+}
+
+.lead-card p {
+    color: #7595b4;
+    font-size: 11px;
+    line-height: 1.45;
+
+    margin-top: 8px;
+    max-width: 310px;
+}
+
+.explore {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    margin-top: 13px;
+    padding: 7px 14px;
+
+    border-radius: 16px;
+    background: transparent;
+
+    font-size: 10px;
+    color: #43aaff;
+    border: 1px solid #1784d0;
+}
+
+.entity .explore {
+    color: #18ddc6;
+    border-color: #00aa9a;
+}
+
+.malware .explore {
+    color: #aa82ff;
+    border-color: #7945e2;
+}
+
+/* =========================================================
+   NETWORK SECTION
+========================================================= */
+
+.network-panel {
+    padding: 12px;
+}
+
+.panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 3px 11px;
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.panel-title-icon {
+    width: 39px;
+    height: 39px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #24adff;
+    background: rgba(17, 117, 192, .15);
+    font-size: 19px;
+}
+
+.panel-title h2 {
+    font-size: 15px;
+}
+
+.panel-title p {
+    color: #6e8da9;
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.view-btn {
+    padding: 7px 13px;
+
+    color: #a8c8e4;
+    background: #06213b;
+
+    border: 1px solid #176293;
+    border-radius: 7px;
+
+    font-size: 10px;
+}
+
+/* =========================================================
+   STAT BOXES
+========================================================= */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 11px;
+    margin-bottom: 10px;
+}
+
+.stat {
+    height: 62px;
+
+    border: 1px solid #124369;
+    border-radius: 7px;
+
+    background: #061c33;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px;
+}
+
+.stat-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color: #2caeff;
+    background: #082b49;
+}
+
+.stat label {
+    display: block;
+    color: #7795b2;
+    font-size: 9px;
+}
+
+.stat strong {
+    display: block;
+    margin-top: 3px;
+    font-size: 16px;
+}
+
+/* =========================================================
+   NETWORK LOWER AREA
+========================================================= */
+
+.network-main {
+    display: grid;
+    grid-template-columns: 1.04fr .66fr;
+    gap: 10px;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.indicator-box {
+    border: 1px solid #123d60;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #061b31;
+}
+
+.filters {
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 0 10px;
+
+    border-bottom: 1px solid #12354f;
+}
+
+.filter {
+    padding: 5px 10px;
+
+    border-radius: 14px;
+
+    color: #7f9bb7;
+    font-size: 9px;
+}
+
+.filter.active {
+    color: white;
+    background: #2456b0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+thead {
+    color: #7794b0;
+}
+
+th,
+td {
+    padding: 8px 9px;
+    text-align: left;
+    border-bottom: 1px solid #0c2b46;
+}
+
+tbody tr:hover {
+    background: rgba(23, 94, 151, .1);
+}
+
+.type {
+    color: #d5e5f5;
+}
+
+.indicator {
+    color: #b7d0e8;
+}
+
+.pill {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 8px;
+}
+
+.observed {
+    background: #0c4372;
+    color: #67baff;
+}
+
+.potential {
+    background: #10484d;
+    color: #52d6cc;
+}
+
+.suspicious {
+    background: #70490d;
+    color: #ffc03e;
+}
+
+.malicious {
+    background: #6c2636;
+    color: #ff8293;
+}
+
+.unknown {
+    background: #26364d;
+    color: #9eafc4;
+}
+
+.medium {
+    background: #65460c;
+    color: #ffd055;
+}
+
+.high {
+    background: #672537;
+    color: #ff8497;
+}
+
+.low {
+    background: #23374c;
+    color: #a6b7c9;
+}
+
+.pagination {
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 10px;
+
+    color: #6c8ba7;
+    font-size: 9px;
+}
+
+.pages {
+    display: flex;
+    gap: 4px;
+}
+
+.page {
+    width: 20px;
+    height: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 4px;
+
+    color: #7896b3;
+}
+
+.page.active {
+    color: white;
+    background: #2468d2;
+}
+
+/* =========================================================
+   MAP
+========================================================= */
+
+.map-box {
+    position: relative;
+    min-height: 245px;
+
+    border: 1px solid #123d60;
+    border-radius: 8px;
+
+    background:
+        radial-gradient(ellipse at 55% 48%, rgba(20, 62, 103, .35), transparent 55%),
+        #06182c;
+
+    overflow: hidden;
+}
+
+.map-title {
+    padding: 12px;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.map {
+    position: absolute;
+    inset: 38px 8px 8px;
+
+    opacity: .9;
+
+    background-image:
+        radial-gradient(circle at 24% 32%, rgba(255, 68, 96, .8) 0 5px, transparent 6px),
+        radial-gradient(circle at 57% 34%, rgba(45, 159, 255, .9) 0 4px, transparent 5px),
+        radial-gradient(circle at 79% 58%, rgba(122, 83, 255, .9) 0 5px, transparent 6px),
+
+        linear-gradient(24deg, transparent 48%, rgba(33, 89, 132, .45) 49%, transparent 50%),
+        linear-gradient(-18deg, transparent 48%, rgba(33, 89, 132, .3) 49%, transparent 50%);
+
+    background-size:
+        100% 100%,
+        100% 100%,
+        100% 100%,
+        70% 60%,
+        80% 70%;
+
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.map::before {
+    content: "";
+
+    position: absolute;
+    left: 13%;
+    top: 18%;
+    width: 70%;
+    height: 55%;
+
+    opacity: .45;
+
+    background:
+        radial-gradient(ellipse at 25% 55%, #16415c 0 17%, transparent 18%),
+        radial-gradient(ellipse at 55% 35%, #123c58 0 19%, transparent 20%),
+        radial-gradient(ellipse at 78% 60%, #103851 0 15%, transparent 16%);
+
+    filter: blur(1px);
+}
+
+.connection {
+    position: absolute;
+    left: 25%;
+    top: 39%;
+
+    width: 53%;
+    height: 1px;
+
+    background: linear-gradient(
+        90deg,
+        #ff536e,
+        #339cff,
+        #8c5dff
+    );
+
+    transform: rotate(8deg);
+    box-shadow: 0 0 8px rgba(76, 133, 255, .6);
+}
+
+.map-label {
+    position: absolute;
+
+    left: 5%;
+    top: 25%;
+
+    padding: 8px 10px;
+
+    border: 1px solid #16476c;
+    border-radius: 6px;
+
+    background: rgba(3, 18, 34, .9);
+
+    font-size: 9px;
+}
+
+.map-label strong {
+    display: block;
+    color: #d9e7f5;
+}
+
+.map-label span {
+    color: #7694b0;
+}
+
+.zoom {
+    position: absolute;
+    right: 9px;
+    bottom: 28px;
+
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid #23435d;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.zoom button {
+    width: 24px;
+    height: 24px;
+
+    color: #b8d1e7;
+    background: #0a2942;
+    border: 0;
+    border-bottom: 1px solid #23435d;
+}
+
+.legend {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 7px;
+
+    display: flex;
+    gap: 16px;
+
+    color: #7794af;
+    font-size: 8px;
+}
+
+.legend i {
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    margin-right: 4px;
+    border-radius: 50%;
+}
+
+.legend .blue { background: #248fff; }
+.legend .yellow { background: #ffc344; }
+.legend .red { background: #ff4f68; }
+.legend .gray { background: #9baed0; }
+
+/* =========================================================
+   BOTTOM MINI PANELS
+========================================================= */
+
+.bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.mini {
+    min-height: 105px;
+    padding: 10px;
+
+    border: 1px solid #123d60;
+    border-radius: 8px;
+
+    background: #061b31;
+}
+
+.mini-head {
+    display: flex;
+    justify-content: space-between;
+
+    color: #e0edf9;
+    font-size: 10px;
+    margin-bottom: 10px;
+}
+
+.mini-head span {
+    color: #4faaff;
+    font-size: 8px;
+}
+
+.activity {
+    display: grid;
+    grid-template-columns: 25px 1fr auto;
+    gap: 7px;
+
+    margin-bottom: 8px;
+}
+
+.activity-icon {
+    color: #42aaff;
+}
+
+.activity strong {
+    display: block;
+    font-size: 8px;
+    font-weight: 500;
+}
+
+.activity small {
+    display: block;
+    margin-top: 2px;
+    color: #63829f;
+    font-size: 7px;
+}
+
+.activity .pill {
+    align-self: start;
+}
+
+.infrastructure {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 8px;
+}
+
+.infra-item {
+    text-align: center;
+}
+
+.infra-icon {
+    width: 32px;
+    height: 32px;
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color: #27a8ff;
+    background: #0a2b48;
+}
+
+.infra-item strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 10px;
+}
+
+.infra-item span {
+    color: #6988a5;
+    font-size: 7px;
+}
+
+.actions {
+    display: grid;
+    gap: 4px;
+}
+
+.action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 3px 1px;
+
+    color: #9bb5ce;
+    font-size: 8px;
+}
+
+.action span {
+    color: #738fab;
+}
+
+/* =========================================================
+   RIGHT ASSISTANT
+========================================================= */
+
+.right {
+    position: fixed;
+    top: 82px;
+    right: 0;
+    bottom: 0;
+
+    width: 340px;
+
+    padding: 21px 15px;
+
+    background: #031425;
+    border-left: 1px solid #12304b;
+
+    overflow-y: auto;
+    z-index: 30;
+}
+
+.main {
+    padding-right: 340px;
+}
+
+.assistant,
+.notes {
+    border: 1px solid #15446b;
+    border-radius: 10px;
+
+    background:
+        linear-gradient(145deg, #071d34, #05172a);
+
+    padding: 13px;
+}
+
+.assistant-head,
+.notes-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+.assistant-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.robot {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #2461c7;
+    color: white;
+    font-size: 20px;
+}
+
+.online {
+    color: #13d9b8;
+    font-size: 9px;
+}
+
+.online::before {
+    content: "";
+    display: inline-block;
+
+    width: 6px;
+    height: 6px;
+
+    margin-right: 6px;
+
+    border-radius: 50%;
+    background: #16d9b9;
+}
+
+.ai-message {
+    padding: 14px;
+
+    color: #a5bdd5;
+    font-size: 11px;
+    line-height: 1.5;
+
+    border-radius: 9px;
+
+    background: rgba(14, 49, 82, .55);
+}
+
+.ai-message p + p {
+    margin-top: 10px;
+}
+
+.ai-actions {
+    display: grid;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.ai-btn {
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 0 12px;
+
+    border: 1px solid #15507d;
+    border-radius: 15px;
+
+    color: #b6cbe0;
+    background: #071e36;
+
+    font-size: 9px;
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.ai-btn:hover {
+    color: white;
+    background: #0b2948;
+    border-color: #2577b4;
+}
+
+.chat {
+    height: 66px;
+
+    position: relative;
+
+    margin-top: 10px;
+
+    border: 1px solid #174a72;
+    border-radius: 8px;
+
+    background: #061a31;
+
+    padding: 10px;
+
+    color: #6e8ca8;
+    font-size: 9px;
+}
+
+.send {
+    position: absolute;
+    right: 9px;
+    bottom: 9px;
+
+    width: 38px;
+    height: 38px;
+
+    border: 0;
+    border-radius: 50%;
+
+    color: white;
+    background: #7053ef;
+
+    font-size: 18px;
+}
+
+/* =========================================================
+   NOTES
+========================================================= */
+
+.notes {
+    margin-top: 18px;
+}
+
+.notes-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notes-icon {
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffbf38;
+    background: rgba(255, 174, 0, .13);
+    border-radius: 8px;
+}
+
+textarea {
+    width: 100%;
+    height: 147px;
+
+    resize: none;
+
+    outline: none;
+
+    padding: 13px;
+
+    color: #abc2d8;
+    background: #06192e;
+
+    border: 1px solid #173e61;
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: 10px;
+}
+
+textarea::placeholder {
+    color: #6887a3;
+}
+
+.notes-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 8px;
+
+    color: #6988a3;
+    font-size: 9px;
+}
+
+.save {
+    padding: 10px 18px;
+
+    border: 0;
+    border-radius: 8px;
+
+    color: white;
+    background: linear-gradient(135deg, #7454f3, #5f44db);
+
+    font-size: 10px;
+    cursor: pointer;
+
+    box-shadow: 0 5px 18px rgba(96, 67, 225, .2);
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #031222;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #153b5c;
+    border-radius: 10px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1250px) {
+
+    .right {
+        position: static;
+        width: auto;
+        grid-column: 2;
+        border-left: 0;
+        border-top: 1px solid #12304b;
+    }
+
+    .main {
+        padding-right: 0;
+    }
+
+    .app {
+        grid-template-columns: 224px minmax(0, 1fr);
+    }
+
+    .topbar {
+        grid-template-columns: 20px 1fr 20px;
+    }
+
+    .top-right {
+        display: none;
+    }
+
+    .lead-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 850px) {
+
+    .sidebar {
+        position: static;
+        width: 70px;
+    }
+
+    .app {
+        grid-template-columns: 70px 1fr;
+    }
+
+    .logo {
+        padding: 0;
+        justify-content: center;
+    }
+
+    .logo-text,
+    .nav-item span:not(.nav-icon),
+    .check,
+    .quote {
+        display: none;
+    }
+
+    .nav-item {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .content {
+        padding: 16px;
+    }
+
+    .network-main,
+    .bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .topbar {
+        height: 70px;
+        overflow: hidden;
+    }
+
+    .progress {
+        transform: scale(.8);
+    }
+
+    .page-head {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .case {
+        min-width: 175px;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .page-head {
+        flex-direction: column;
+    }
+
+    .case {
+        width: 100%;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .tabs {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .tab {
+        min-width: 130px;
+    }
+
+    table {
+        min-width: 650px;
+    }
+
+    .indicator-box {
+        overflow-x: auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-shield">⬡</div>
+
+            <div class="logo-text">
+                <strong>Cyber Triage</strong>
+                <span>From Evidence to Action</span>
+            </div>
+        </div>
+
+        <nav class="nav">
+
+            <div class="nav-item">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>Acquire</span>
+                <b class="check">✓</b>
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">◇</span>
+                <span>Classify</span>
+                <b class="check">✓</b>
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">▧</span>
+                <span>Extract</span>
+                <b class="check">✓</b>
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">ↄ</span>
+                <span>Correlate</span>
+                <b class="check">✓</b>
+            </div>
+
+            <div class="nav-item active">
+                <span class="nav-icon">⌕</span>
+                <span>Investigate</span>
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>Reports</span>
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </div>
+
+        </nav>
+
+        <div class="quote">
+            “The truth is<br>
+            hidden in the details.”
+            <small>— Sherlock Holmes</small>
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- TOP PROGRESS -->
+
+        <header class="topbar">
+
+            <div></div>
+
+            <div class="progress">
+
+                <div class="step">
+                    <div class="step-dot">✓</div>
+                    Acquire
+                </div>
+
+                <div class="step">
+                    <div class="step-dot">✓</div>
+                    Classify
+                </div>
+
+                <div class="step">
+                    <div class="step-dot">✓</div>
+                    Extract
+                </div>
+
+                <div class="step">
+                    <div class="step-dot">✓</div>
+                    Correlate
+                </div>
+
+                <div class="step current">
+                    <div class="step-dot">⌕</div>
+                    Investigate
+                </div>
+
+            </div>
+
+            <div class="top-right">
+
+                <span class="mode-icon">☼</span>
+                <span class="mode-icon">◐</span>
+
+                <div class="profile">
+                    <div class="avatar">♙</div>
+
+                    <div>
+                        <strong>Cyber Security Officer</strong>
+                        <span>Investigation Mode</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <!-- PAGE HEADER -->
+
+            <div class="page-head">
+
+                <div class="page-title">
+
+                    <div class="search-big">⌕</div>
+
+                    <div>
+                        <h1>Investigate</h1>
+                        <p>
+                            Turn clues into answers. Use evidence,
+                            your reasoning and AI assistance to uncover the truth.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="case">
+
+                    <div class="case-row">
+                        <span class="case-label">Case ID</span>
+                        <strong>#CT-2025-0819</strong>
+                    </div>
+
+                    <div class="case-row">
+                        <span class="case-label">Status</span>
+                        <span class="status">
+                            <i></i>In Progress
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TABS -->
+
+            <div class="tabs">
+
+                <div class="tab active">
+                    Investigation Leads
+                </div>
+
+                <div class="tab">
+                    Evidence Review
+                </div>
+
+                <div class="tab">
+                    Timeline
+                </div>
+
+                <div class="tab">
+                    Connections
+                </div>
+
+                <div class="tab">
+                    Final Findings
+                </div>
+
+            </div>
+
+
+            <!-- INVESTIGATION LEADS -->
+
+            <div class="lead-grid">
+
+                <div class="card lead-card network">
+
+                    <span class="badge">Network</span>
+
+                    <div class="lead-icon">◎</div>
+
+                    <h2>
+                        Trace & Analyze<br>
+                        Network Indicators
+                    </h2>
+
+                    <p>
+                        Investigate IPs, domains, DNS, connections,
+                        ports and related network infrastructure.
+                    </p>
+
+                    <button class="explore">
+                        Explore →
+                    </button>
+
+                </div>
+
+
+                <div class="card lead-card entity">
+
+                    <span class="badge">Entities</span>
+
+                    <div class="lead-icon">●</div>
+
+                    <h2>
+                        Investigate Suspicious<br>
+                        Entities
+                    </h2>
+
+                    <p>
+                        Explore accounts, emails, devices, domains
+                        and other entities linked to the incident.
+                    </p>
+
+                    <button class="explore">
+                        Explore →
+                    </button>
+
+                </div>
+
+
+                <div class="card lead-card malware">
+
+                    <span class="badge">Malware</span>
+
+                    <div class="lead-icon">☣</div>
+
+                    <h2>
+                        Analyze Malware & Artifacts
+                    </h2>
+
+                    <p>
+                        Examine suspicious files, hashes, behaviors,
+                        IOCs and possible relationships.
+                    </p>
+
+                    <button class="explore">
+                        Explore →
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- NETWORK INDICATORS -->
+
+            <section class="card network-panel">
+
+                <div class="panel-heading">
+
+                    <div class="panel-title">
+
+                        <div class="panel-title-icon">◎</div>
+
+                        <div>
+                            <h2>Network Indicators</h2>
+                            <p>
+                                View and analyze network evidence related to the incident.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <button class="view-btn">
+                        View All Indicators →
+                    </button>
+
+                </div>
+
+
+                <!-- STATS -->
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <div class="stat-icon">▥</div>
+                        <div>
+                            <label>Total Indicators</label>
+                            <strong>12</strong>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-icon">●</div>
+                        <div>
+                            <label>IPs</label>
+                            <strong>4</strong>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-icon">ↄ</div>
+                        <div>
+                            <label>Domains/URLs</label>
+                            <strong>5</strong>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-icon">DNS</div>
+                        <div>
+                            <label>DNS Records</label>
+                            <strong>2</strong>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-icon">▣</div>
+                        <div>
+                            <label>Ports/Protocols</label>
+                            <strong>1</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- TABLE + MAP -->
+
+                <div class="network-main">
+
+                    <div class="indicator-box">
+
+                        <div class="filters">
+
+                            <span class="filter active">All</span>
+                            <span class="filter">IPs</span>
+                            <span class="filter">Domains</span>
+                            <span class="filter">DNS</span>
+                            <span class="filter">Ports</span>
+
+                        </div>
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Indicator</th>
+                                    <th>Status</th>
+                                    <th>Reputation</th>
+                                    <th>Confidence</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td class="type">◉ IP</td>
+                                    <td class="indicator">185.199.110.24</td>
+                                    <td>
+                                        <span class="pill observed">
+                                            Observed
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill suspicious">
+                                            Suspicious
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill medium">
+                                            Medium
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="type">◉ Domain</td>
+                                    <td class="indicator">login-secure.xyz</td>
+                                    <td>
+                                        <span class="pill observed">
+                                            Observed
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill malicious">
+                                            Malicious
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill high">
+                                            High
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="type">◉ Domain</td>
+                                    <td class="indicator">cdn-update.net</td>
+                                    <td>
+                                        <span class="pill observed">
+                                            Observed
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill suspicious">
+                                            Suspicious
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill medium">
+                                            Medium
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="type">◉ IP</td>
+                                    <td class="indicator">45.12.76.93</td>
+                                    <td>
+                                        <span class="pill potential">
+                                            Potential
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill unknown">
+                                            Unknown
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill low">
+                                            Low
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="type">◉ DNS</td>
+                                    <td class="indicator">malware-c2.ddns.net</td>
+                                    <td>
+                                        <span class="pill observed">
+                                            Observed
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill malicious">
+                                            Malicious
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill high">
+                                            High
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                        <div class="pagination">
+
+                            <span>
+                                Showing 1–5 of 12 indicators
+                            </span>
+
+                            <div class="pages">
+                                <span class="page">‹</span>
+                                <span class="page active">1</span>
+                                <span class="page">2</span>
+                                <span class="page">3</span>
+                                <span class="page">›</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MAP -->
+
+                    <div class="map-box">
+
+                        <div class="map-title">
+                            Indicator Locations
+                        </div>
+
+                        <div class="map">
+
+                            <div class="connection"></div>
+
+                            <div class="map-label">
+                                <strong>185.199.110.24</strong>
+                                <span>US (Virginia)</span>
+                            </div>
+
+                        </div>
+
+                        <div class="zoom">
+                            <button>+</button>
+                            <button>−</button>
+                        </div>
+
+                        <div class="legend">
+                            <span>
+                                <i class="blue"></i>Observed
+                            </span>
+
+                            <span>
+                                <i class="yellow"></i>Suspicious
+                            </span>
+
+                            <span>
+                                <i class="red"></i>Malicious
+                            </span>
+
+                            <span>
+                                <i class="gray"></i>Unknown
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTTOM MINI CARDS -->
+
+                <div class="bottom-grid">
+
+                    <div class="mini">
+
+                        <div class="mini-head">
+                            Recent Network Activity
+                            <span>View All →</span>
+                        </div>
+
+                        <div class="activity">
+                            <div class="activity-icon">◉</div>
+
+                            <div>
+                                <strong>
+                                    Outbound connection
+                                    &nbsp; 185.199.110.24:443
+                                </strong>
+
+                                <small>
+                                    2025-09-18 14:32
+                                </small>
+                            </div>
+
+                            <span class="pill observed">
+                                Observed
+                            </span>
+                        </div>
+
+                        <div class="activity">
+                            <div class="activity-icon">◉</div>
+
+                            <div>
+                                <strong>DNS query &nbsp; login-secure.xyz</strong>
+
+                                <small>
+                                    2025-09-18 14:21
+                                </small>
+                            </div>
+
+                            <span class="pill observed">
+                                Observed
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini">
+
+                        <div class="mini-head">
+                            Related Infrastructure
+                            <span>View Details →</span>
+                        </div>
+
+                        <div class="infrastructure">
+
+                            <div class="infra-item">
+                                <div class="infra-icon">◎</div>
+                                <strong>3</strong>
+                                <span>Domains</span>
+                            </div>
+
+                            <div class="infra-item">
+                                <div class="infra-icon">●</div>
+                                <strong>2</strong>
+                                <span>Shared IPs</span>
+                            </div>
+
+                            <div class="infra-item">
+                                <div class="infra-icon">▣</div>
+                                <strong>1</strong>
+                                <span>Related Hosts</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini">
+
+                        <div class="mini-head">
+                            Quick Actions
+                        </div>
+
+                        <div class="actions">
+
+                            <div class="action">
+                                <span>◎</span>
+                                Run WHOIS Lookup
+                                <b>›</b>
+                            </div>
+
+                            <div class="action">
+                                <span>◉</span>
+                                Check Threat Intelligence
+                                <b>›</b>
+                            </div>
+
+                            <div class="action">
+                                <span>⌘</span>
+                                Visualize Connections
+                                <b>›</b>
+                            </div>
+
+                            <div class="action">
+                                <span>▣</span>
+                                Export Report
+                                <b>›</b>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         RIGHT SIDEBAR
+    ====================================================== -->
+
+    <aside class="right">
+
+        <!-- AI ASSISTANT -->
+
+        <section class="assistant">
+
+            <div class="assistant-head">
+
+                <div class="assistant-title">
+                    <div class="robot">♙</div>
+                    AI Investigation Assistant
+                </div>
+
+                <span class="online">Online</span>
+
+            </div>
+
+
+            <div class="ai-message">
+
+                <p>
+                    Hi! I'm your investigation partner.
+                    I can help you analyze the evidence,
+                    explain technical details, and suggest
+                    possible leads, next steps, or questions to ask.
+                </p>
+
+                <p>
+                    What would you like to do?
+                </p>
+
+            </div>
+
+
+            <div class="ai-actions">
+
+                <button class="ai-btn">
+                    ›
+                    Summarize network indicators
+                </button>
+
+                <button class="ai-btn">
+                    ↗
+                    Explain this suspicious domain
+                </button>
+
+                <button class="ai-btn">
+                    ›
+                    Suggest next investigation steps
+                </button>
+
+                <button class="ai-btn">
+                    ⌕
+                    Check if this IP is a VPN / proxy
+                </button>
+
+                <button class="ai-btn">
+                    ⤨
+                    Help me connect the dots
+                </button>
+
+            </div>
+
+
+            <div class="chat">
+                Ask me anything about this case...
+
+                <button class="send">
+                    ➤
+                </button>
+            </div>
+
+        </section>
+
+
+        <!-- NOTES -->
+
+        <section class="notes">
+
+            <div class="notes-head">
+
+                <div class="notes-title">
+
+                    <div class="notes-icon">▣</div>
+
+                    <strong>Investigator's Notes</strong>
+
+                </div>
+
+                <span class="online">Saved</span>
+
+            </div>
+
+
+            <textarea
+                id="notes"
+                maxlength="2000"
+                placeholder="Write your observations, clues, hypotheses, or things to verify later..."
+            ></textarea>
+
+
+            <div class="notes-bottom">
+
+                <span id="counter">0/2000</span>
+
+                <button class="save" onclick="saveNotes()">
+                    ▣ Save Note
+                </button>
+
+            </div>
+
+        </section>
+
+    </aside>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   TABS
+========================================================= */
+
+document.querySelectorAll(".tab").forEach(tab => {
+
+    tab.addEventListener("click", () => {
+
+        document
+            .querySelectorAll(".tab")
+            .forEach(t => t.classList.remove("active"));
+
+        tab.classList.add("active");
+
+    });
+
+});
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+document.querySelectorAll(".filter").forEach(filter => {
+
+    filter.addEventListener("click", () => {
+
+        document
+            .querySelectorAll(".filter")
+            .forEach(f => f.classList.remove("active"));
+
+        filter.classList.add("active");
+
+    });
+
+});
+
+
+/* =========================================================
+   NOTES COUNTER
+========================================================= */
+
+const notes = document.getElementById("notes");
+const counter = document.getElementById("counter");
+
+notes.addEventListener("input", () => {
+
+    counter.textContent =
+        `${notes.value.length}/2000`;
+
+});
+
+
+/* =========================================================
+   SAVE NOTES
+========================================================= */
+
+function saveNotes() {
+
+    localStorage.setItem(
+        "cyberTriageNotes",
+        notes.value
+    );
+
+    const button = document.querySelector(".save");
+
+    button.textContent = "✓ Saved";
+
+    setTimeout(() => {
+        button.textContent = "▣ Save Note";
+    }, 1400);
+
+}
+
+
+/* =========================================================
+   LOAD NOTES
+========================================================= */
+
+window.addEventListener("load", () => {
+
+    const saved =
+        localStorage.getItem("cyberTriageNotes");
+
+    if (saved) {
+
+        notes.value = saved;
+
+        counter.textContent =
+            `${saved.length}/2000`;
+
+    }
+
+});
+
+
+/* =========================================================
+   AI BUTTON DEMO
+========================================================= */
+
+document.querySelectorAll(".ai-btn").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const chat = document.querySelector(".chat");
+
+        const original = chat.childNodes[0];
+
+        if (original) {
+            original.textContent =
+                "Analyzing case evidence...";
+        }
+
+        setTimeout(() => {
+
+            if (original) {
+                original.textContent =
+                    "Analysis prepared. Ask me anything about this case...";
+            }
+
+        }, 1000);
+
+    });
+
+});
+
+
+/* =========================================================
+   EXPLORE BUTTONS
+========================================================= */
+
+document.querySelectorAll(".explore").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        button.textContent = "Opening →";
+
+        setTimeout(() => {
+            button.textContent = "Explore →";
+        }, 700);
+
+    });
+
+});
+
+
+/* =========================================================
+   MAP ZOOM DEMO
+========================================================= */
+
+let zoomLevel = 1;
+
+document.querySelectorAll(".zoom button").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        if (button.textContent === "+") {
+            zoomLevel = Math.min(zoomLevel + .1, 1.5);
+        } else {
+            zoomLevel = Math.max(zoomLevel - .1, .7);
+        }
+
+        document.querySelector(".map").style.transform =
+            `scale(${zoomLevel})`;
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyber Triage - Officer Login</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+        }
+
+        /* BACKGROUND */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 30%, #182a55 0%, transparent 35%),
+                radial-gradient(circle at 80% 70%, #241447 0%, transparent 35%);
+            z-index: -1;
+        }
+
+        /* LOGIN CARD */
+
+        .login-card {
+            width: 420px;
+            padding: 40px;
+
+            background: rgba(21, 27, 46, 0.92);
+
+            border: 1px solid #252d47;
+            border-radius: 18px;
+
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+        }
+
+        /* BRANDING */
+
+        .brand {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .brand-icon {
+            width: 70px;
+            height: 70px;
+
+            margin: 0 auto 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+
+            background: #0f1a35;
+            border: 1px solid #3b82f6;
+
+            font-size: 34px;
+        }
+
+        .brand h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+        }
+
+        .brand p {
+            margin: 0;
+            color: #8f98b3;
+            font-size: 14px;
+        }
+
+        /* FORM */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+
+            color: #b8bfd3;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px;
+
+            background: #0f1528;
+            color: white;
+
+            border: 1px solid #303952;
+            border-radius: 9px;
+
+            outline: none;
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .form-group input::placeholder {
+            color: #626b84;
+        }
+
+        /* LOGIN BUTTON */
+
+        button {
+            width: 100%;
+            padding: 14px;
+
+            margin-top: 5px;
+
+            border: none;
+            border-radius: 9px;
+
+            background: #2563eb;
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        /* SECURITY MESSAGE */
+
+        .security {
+            text-align: center;
+            margin-top: 22px;
+
+            color: #626b84;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .security strong {
+            color: #8f98b3;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 500px) {
+
+            .login-card {
+                width: calc(100% - 30px);
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="background"></div>
+
+    <div class="login-card">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🔐
+            </div>
+
+            <h1>Cyber Triage</h1>
+
+            <p>Cyber Investigation & Digital Forensics</p>
+
+        </div>
+
+
+        <form>
+
+            <div class="form-group">
+
+                <label for="userId">
+                    Officer User ID
+                </label>
+
+                <input
+                    type="text"
+                    id="userId"
+                    placeholder="Enter your User ID"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+            </div>
+
+
+            <button type="submit">
+                Sign In
+            </button>
+
+        </form>
+
+
+        <div class="security">
+            🔒 Authorized personnel only<br>
+            <strong>Secure investigation environment</strong>
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const form = document.querySelector("form");
+
+        form.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const userId =
+                document.getElementById("userId").value;
+
+            const password =
+                document.getElementById("password").value;
+
+
+            if (userId === "officer01" && password === "1234") {
+
+                window.location.href = "dashboard.html";
+
+            } else {
+
+                alert("Invalid User ID or Password");
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

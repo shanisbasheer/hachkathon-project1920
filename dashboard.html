@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyber Triage - Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: white;
+        }
+
+        /* Background glow */
+        .background {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 10% 10%, #182a55 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, #241447 0%, transparent 30%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            height: 72px;
+            background: rgba(21, 27, 46, 0.95);
+            border-bottom: 1px solid #252d47;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #0f1a35;
+            border: 1px solid #3b82f6;
+            border-radius: 10px;
+
+            font-size: 20px;
+        }
+
+        .logo h1 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .officer {
+            color: #8f98b3;
+            font-size: 13px;
+        }
+
+        .logout {
+            padding: 8px 14px;
+            border: 1px solid #303952;
+            border-radius: 8px;
+
+            background: #0f1528;
+            color: #b8bfd3;
+
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .logout:hover {
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        /* Main */
+        .container {
+            padding: 35px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .welcome {
+            margin-bottom: 30px;
+        }
+
+        .welcome h2 {
+            margin: 0 0 8px;
+            font-size: 27px;
+        }
+
+        .welcome p {
+            margin: 0;
+            color: #8f98b3;
+        }
+
+        /* Overview cards */
+        .overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: #151b2e;
+            border: 1px solid #252d47;
+            border-radius: 12px;
+            padding: 20px;
+
+            transition: 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: #3b82f6;
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-title {
+            color: #8f98b3;
+            font-size: 13px;
+        }
+
+        .stat-icon {
+            font-size: 20px;
+        }
+
+        .stat-number {
+            margin-top: 12px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* Cases */
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            margin-bottom: 18px;
+        }
+
+        .section-heading h2 {
+            margin: 0 0 6px;
+        }
+
+        .section-heading p {
+            margin: 0;
+            color: #8f98b3;
+            font-size: 14px;
+        }
+
+        .case-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .case {
+            background: #151b2e;
+            padding: 22px 25px;
+
+            border-radius: 12px;
+            border: 1px solid #252d47;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .case:hover {
+            transform: translateY(-3px);
+            border-color: #3b82f6;
+            background: #171f35;
+        }
+
+        .case-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .case-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #0f1528;
+            border: 1px solid #303952;
+            border-radius: 10px;
+
+            font-size: 21px;
+        }
+
+        .case-info-main h3 {
+            margin: 0 0 6px;
+            font-size: 16px;
+        }
+
+        .case-info-main p {
+            margin: 0;
+            color: #8f98b3;
+            font-size: 13px;
+        }
+
+        .case-right {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+        }
+
+        .case-detail {
+            min-width: 100px;
+        }
+
+        .case-detail span {
+            display: block;
+            color: #626b84;
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .case-detail strong {
+            font-size: 13px;
+        }
+
+        /* Status / Priority badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 6px;
+
+            font-size: 11px;
+            font-weight: bold;
+
+            background: #202942;
+            color: #b8bfd3;
+        }
+
+        .critical {
+            color: #ff8f8f;
+            background: #351c28;
+        }
+
+        .high {
+            color: #ffbd70;
+            background: #352719;
+        }
+
+        .new {
+            color: #6ea8ff;
+            background: #182b4d;
+        }
+
+        .investigating {
+            color: #c0a0ff;
+            background: #29203d;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+
+            .overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .case {
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .case-right {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            header {
+                padding: 0 18px;
+            }
+
+            .officer {
+                display: none;
+            }
+
+            .container {
+                padding: 25px 18px;
+            }
+
+            .overview {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .case {
+                flex-direction: column;
+            }
+
+            .case-right {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="background"></div>
+
+    <!-- Header -->
+    <header>
+
+        <div class="logo">
+            <div class="logo-icon">🔐</div>
+            <h1>Cyber Triage</h1>
+        </div>
+
+        <div class="header-right">
+            <span class="officer">
+                Officer: officer01
+            </span>
+
+            <button class="logout" onclick="logout()">
+                Logout
+            </button>
+        </div>
+
+    </header>
+
+
+    <!-- Main Dashboard -->
+    <div class="container">
+
+        <div class="welcome">
+            <h2>Investigation Dashboard</h2>
+            <p>
+                Monitor active cases and manage your digital forensic investigations.
+            </p>
+        </div>
+
+
+        <!-- Overview -->
+        <div class="overview">
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-title">Total Cases</span>
+                    <span class="stat-icon">📁</span>
+                </div>
+                <div class="stat-number">2</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-title">New Cases</span>
+                    <span class="stat-icon">🆕</span>
+                </div>
+                <div class="stat-number">1</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-title">Investigating</span>
+                    <span class="stat-icon">🔎</span>
+                </div>
+                <div class="stat-number">1</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-title">Critical</span>
+                    <span class="stat-icon">⚠️</span>
+                </div>
+                <div class="stat-number">1</div>
+            </div>
+
+        </div>
+
+
+        <!-- Cases -->
+        <div class="section-heading">
+            <div>
+                <h2>Cases</h2>
+                <p>Recent investigations requiring attention.</p>
+            </div>
+        </div>
+
+
+        <div class="case-list">
+
+            <!-- Case 1042 -->
+            <div class="case" onclick="openCase('CASE-1042')">
+
+                <div class="case-left">
+
+                    <div class="case-icon">
+                        🎣
+                    </div>
+
+                    <div class="case-info-main">
+                        <h3>CASE-1042</h3>
+                        <p>Phishing Attack Investigation</p>
+                    </div>
+
+                </div>
+
+
+                <div class="case-right">
+
+                    <div class="case-detail">
+                        <span>STATUS</span>
+                        <strong class="badge new">New</strong>
+                    </div>
+
+                    <div class="case-detail">
+                        <span>PRIORITY</span>
+                        <strong class="badge critical">Critical</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Case 1043 -->
+            <div class="case" onclick="openCase('CASE-1043')">
+
+                <div class="case-left">
+
+                    <div class="case-icon">
+                        🌐
+                    </div>
+
+                    <div class="case-info-main">
+                        <h3>CASE-1043</h3>
+                        <p>Suspicious Network Activity</p>
+                    </div>
+
+                </div>
+
+
+                <div class="case-right">
+
+                    <div class="case-detail">
+                        <span>STATUS</span>
+                        <strong class="badge investigating">
+                            Under Investigation
+                        </strong>
+                    </div>
+
+                    <div class="case-detail">
+                        <span>PRIORITY</span>
+                        <strong class="badge high">High</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function openCase(caseId) {
+            window.location.href = "case.html";
+        }
+
+
+        function logout() {
+            window.location.href = "index.html";
+        }
+
+    </script>
+
+</body>
+</html>

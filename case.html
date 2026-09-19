@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyber Triage - Case Details</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: white;
+            margin: 0;
+        }
+
+        header {
+            background: #151b2e;
+            padding: 20px 30px;
+            border-bottom: 1px solid #252d47;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        /* CASE HEADER */
+
+        .case-header {
+            background: #151b2e;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            border: 1px solid #252d47;
+        }
+
+        .case-header h2 {
+            margin: 0 0 8px 0;
+        }
+
+        .case-header p {
+            color: #b8bfd3;
+            margin: 5px 0;
+        }
+
+        .case-info {
+            display: flex;
+            gap: 40px;
+        }
+
+        .case-info div {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 90px;
+        }
+
+        .case-info span {
+            color: #8f98b3;
+            font-size: 13px;
+        }
+
+        .case-info strong {
+            font-size: 16px;
+        }
+
+        /* AI BRIEFING */
+
+        .ai-briefing {
+            background: #151b2e;
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid #252d47;
+        }
+
+        .ai-content {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .ai-avatar {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background: #0f1a35;
+            border: 1px solid #3b82f6;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 38px;
+            flex-shrink: 0;
+        }
+
+        .ai-main {
+            flex: 1;
+        }
+
+        .ai-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 5px;
+        }
+
+        .ai-title h2 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .ai-title span {
+            color: #8f98b3;
+            font-size: 13px;
+        }
+
+        .ai-main > p {
+            color: #b8bfd3;
+            line-height: 1.5;
+            margin: 8px 0 0 0;
+        }
+
+        .briefing-grid {
+            width: 45%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding-left: 25px;
+            border-left: 1px solid #303952;
+        }
+
+        .briefing-grid div {
+            background: #0f1528;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .briefing-grid span {
+            display: block;
+            color: #8f98b3;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .briefing-grid strong {
+            font-size: 13px;
+        }
+
+        /* TOOLS SECTION */
+
+        .tools-heading {
+            margin-bottom: 18px;
+        }
+
+        .tools-heading h2 {
+            margin: 0 0 6px 0;
+        }
+
+        .tools-heading p {
+            color: #8f98b3;
+            margin: 0;
+        }
+
+        .tools {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .tool {
+            background: #151b2e;
+            padding: 22px;
+            min-height: 145px;
+
+            border-radius: 12px;
+            border: 1px solid #252d47;
+
+            cursor: pointer;
+            transition: 0.2s;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .tool:hover {
+            transform: translateY(-3px);
+            border-color: #3b82f6;
+        }
+
+        .tool h3 {
+            margin: 0 0 8px 0;
+        }
+
+        .tool p {
+            color: #b8bfd3;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 900px) {
+
+            .ai-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .ai-avatar {
+                align-self: center;
+            }
+
+            .briefing-grid {
+                width: 100%;
+                padding-left: 0;
+                padding-top: 18px;
+                border-left: none;
+                border-top: 1px solid #303952;
+            }
+
+            .tools {
+                grid-template-columns: 1fr;
+            }
+
+            .case-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Cyber Triage</h1>
+    </header>
+
+    <div class="container">
+
+        <!-- CASE HEADER -->
+
+        <div class="case-header">
+
+            <div>
+                <h2>CASE-1042</h2>
+                <p>Phishing Attack Investigation</p>
+            </div>
+
+            <div class="case-info">
+
+                <div>
+                    <span>Status</span>
+                    <strong>New</strong>
+                </div>
+
+                <div>
+                    <span>Priority</span>
+                    <strong>Critical</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- AI CASE BRIEFING -->
+
+        <div class="ai-briefing">
+
+            <div class="ai-content">
+
+                <div class="ai-avatar">
+                    🤖
+                </div>
+
+                <div class="ai-main">
+
+                    <div class="ai-title">
+                        <h2>🤖 AI Case Briefing</h2>
+                        <span>Investigation Partner</span>
+                    </div>
+
+                    <p>
+                        A phishing attack has been reported and the case is
+                        currently awaiting investigation. Initial evidence
+                        should be reviewed to identify the attack source,
+                        affected accounts, and suspicious network indicators.
+                    </p>
+
+                </div>
+
+
+                <div class="briefing-grid">
+
+                    <div>
+                        <span>Current Finding</span>
+                        <strong>Phishing activity detected</strong>
+                    </div>
+
+                    <div>
+                        <span>Key Indicators</span>
+                        <strong>Email • URL • Network</strong>
+                    </div>
+
+                    <div>
+                        <span>Verification</span>
+                        <strong>Officer review required</strong>
+                    </div>
+
+                    <div>
+                        <span>Suggested Next Step</span>
+                        <strong>Review available evidence</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- INVESTIGATION TOOLS -->
+
+        <div class="tools-heading">
+            <h2>🔧 Investigation Tools</h2>
+            <p>Use the tools below to analyze, collect and correlate evidence.</p>
+        </div>
+
+
+        <div class="tools">
+
+            <div class="tool">
+                <h3>📥 Acquire</h3>
+                <p>Receive and register evidence.</p>
+            </div>
+
+            <div class="tool">
+                <h3>📂 Classify</h3>
+                <p>Organize evidence by type and source.</p>
+            </div>
+
+            <div class="tool">
+                <h3>🔬 Extract</h3>
+                <p>Extract important forensic information.</p>
+            </div>
+
+            <div class="tool">
+                <h3>🕸️ Relationship Map</h3>
+                <p>Visualize people, devices, accounts and connections.</p>
+            </div>
+
+            <div class="tool">
+                <h3>🧠 Correlate</h3>
+                <p>Find possible connections and patterns.</p>
+            </div>
+
+            <div class="tool">
+                <h3>🔎 Investigate</h3>
+                <p>Investigate entities, indicators and timelines.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
